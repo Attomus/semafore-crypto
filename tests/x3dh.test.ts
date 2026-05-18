@@ -1,11 +1,19 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  bytesToUtf8,
+  decryptMessage,
   deriveX3dhReceiverSecret,
   deriveX3dhSenderSecret,
   ed25519Sign,
+  encryptMessage,
   generateEd25519KeyPair,
+  generateIdentityKeyPair,
+  generateOneTimePrekey,
+  generateSignedPrekey,
   generateX25519KeyPair,
+  initReceiverSession,
+  initSenderSession,
   iosPlanX3dhKdfParameters
 } from '../src/index.js';
 
@@ -58,5 +66,89 @@ describe('X3DH derivation helpers', () => {
     });
 
     expect(senderSecret).toEqual(receiverSecret);
+  });
+
+  it('bootstraps a sender and receiver session through an SMX1 first message', () => {
+    const aliceIdentity = generateIdentityKeyPair();
+    const bobIdentity = generateIdentityKeyPair();
+    const bobSigning = generateEd25519KeyPair();
+    const bobSpk = generateSignedPrekey(bobSigning.secretKey, 'spk-live');
+    const bobOpk = generateOneTimePrekey('opk-live');
+
+    const senderSession = initSenderSession({
+      myIdentity: aliceIdentity,
+      recipientBundle: {
+        identityAgreementKey: bobIdentity.publicKey,
+        identitySigningKey: bobSigning.publicKey,
+        signedPrekey: {
+          keyId: bobSpk.keyId,
+          publicKey: bobSpk.publicKey,
+          signature: bobSpk.signature
+        },
+        oneTimePrekey: {
+          keyId: bobOpk.keyId,
+          publicKey: bobOpk.publicKey
+        }
+      }
+    });
+    const first = encryptMessage(senderSession, 'hello from first contact');
+
+    expect(first.kind).toBe('smx1');
+    expect(senderSession.pendingPrekey).toBeUndefined();
+
+    const receiverInit = initReceiverSession({
+      myIdentity: bobIdentity,
+      senderIdentityPublicKey: aliceIdentity.publicKey,
+      envelope: first,
+      signedPrekeyLookup: (keyId) => {
+        expect(keyId).toBe('spk-live');
+        return bobSpk;
+      },
+      oneTimePrekeyLookup: (keyId) => {
+        expect(keyId).toBe('opk-live');
+        return bobOpk;
+      }
+    });
+
+    expect(bytesToUtf8(decryptMessage(receiverInit.session, first))).toBe(
+      'hello from first contact'
+    );
+  });
+
+  it('rejects SMX1 receiver setup when the required one-time prekey is unavailable', () => {
+    const aliceIdentity = generateIdentityKeyPair();
+    const bobIdentity = generateIdentityKeyPair();
+    const bobSigning = generateEd25519KeyPair();
+    const bobSpk = generateSignedPrekey(bobSigning.secretKey, 'spk-live');
+    const bobOpk = generateOneTimePrekey('opk-live');
+    const senderSession = initSenderSession({
+      myIdentity: aliceIdentity,
+      recipientBundle: {
+        identityAgreementKey: bobIdentity.publicKey,
+        identitySigningKey: bobSigning.publicKey,
+        signedPrekey: {
+          keyId: bobSpk.keyId,
+          publicKey: bobSpk.publicKey,
+          signature: bobSpk.signature
+        },
+        oneTimePrekey: {
+          keyId: bobOpk.keyId,
+          publicKey: bobOpk.publicKey
+        }
+      }
+    });
+    const first = encryptMessage(
+      senderSession,
+      'missing OPK should fail before decrypt'
+    );
+
+    expect(() =>
+      initReceiverSession({
+        myIdentity: bobIdentity,
+        senderIdentityPublicKey: aliceIdentity.publicKey,
+        envelope: first,
+        signedPrekeyLookup: () => bobSpk
+      })
+    ).toThrow('SMX1 one-time prekey was not found');
   });
 });

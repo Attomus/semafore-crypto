@@ -1,0 +1,94 @@
+{
+  "version": "x3dh_smx1_v1",
+  "method": "shared_test_vectors",
+  "notes": "Canonical X3DH first-contact SMX1 vectors per ADR-0168. Source: sf-android origin/main 53eed09d439673b42e04eaa82be5c41dab5e7f50, extracted 2026-05-18 by running X3DHSessionInitiator and PrekeyHeader from the compiled Android code. SMX1 header encoding is magic(4) || flags(1) || EK_A raw public key(32) || SPK id length (uint16 big-endian) || SPK id UTF-8 || OPK id length (uint16 big-endian, zero when absent) || OPK id UTF-8 when present || nonce(12). The signed_prekey_signature_hex fields are Ed25519 signatures over the signed_prekey_pub_der_hex bytes, matching sf-android source.",
+  "constants": {
+    "hkdf_salt_hex": "0000000000000000000000000000000000000000000000000000000000000000",
+    "hkdf_info_ascii": "SemaFore-X3DH-v1",
+    "hkdf_info_utf8_hex": "53656d61466f72652d583344482d7631",
+    "hkdf_output_length_bytes": 32,
+    "smx1_magic_hex": "534d5831",
+    "smx1_flag_opk_used_hex": "01",
+    "smx1_flag_opk_absent_hex": "00",
+    "smx1_id_encoding": "uint16_be_length_prefixed_utf8",
+    "smx1_nonce_length_bytes": 12,
+    "signed_prekey_signature_input": "signed_prekey_pub_der_hex"
+  },
+  "cases": [
+    {
+      "name": "sender-to-recipient-opk-present",
+      "sender": {
+        "device_id": "sender-device",
+        "identity_signing_seed_hex": "0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20",
+        "identity_signing_pub_hex": "79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664",
+        "identity_signing_pub_der_hex": "302a300506032b657003210079b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664",
+        "identity_key_priv_hex": "70788f1a0cea001a2631dae5d05dbd062008d5b30f50b9e29beb2a7822289044",
+        "identity_key_pub_hex": "4a3807d064d077181cc070989e76891d20dca5559548dc2c77c1a50273882b38",
+        "ephemeral_key_priv_hex": "080a0b0c0d0e0f10090a0b0c0d0e0f10090a0b0c0d0e0f10090a0b0c0d0e0f50",
+        "ephemeral_key_pub_hex": "2da6dd857109353f72b23d674c7671f13aace39882c3dbe19b4931df156fe261"
+      },
+      "recipient": {
+        "device_id": "recipient-device",
+        "identity_signing_seed_hex": "0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a",
+        "identity_signing_pub_hex": "542821e9529dd1ad243bfdff5c640a65194b4816987a650de861d7ce9e417a63",
+        "identity_signing_pub_der_hex": "302a300506032b6570032100542821e9529dd1ad243bfdff5c640a65194b4816987a650de861d7ce9e417a63",
+        "identity_key_priv_hex": "30b7cf2a6038d600c5a26ef1488ddae8b4fda9bce98aa9059a2033f59656ea52",
+        "identity_key_pub_hex": "60f88493e15eb7f02166956f852665e85f636fd3db6c1479fe0e7b2ebb7f4f40",
+        "signed_prekey_id": "spk-001",
+        "signed_prekey_priv_hex": "333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f505152",
+        "signed_prekey_pub_hex": "c15d2265459455c9ff156e6c1da6bfb7910bb8af50f2b2f9f853ea9325259d4d",
+        "signed_prekey_pub_der_hex": "302a300506032b656e032100c15d2265459455c9ff156e6c1da6bfb7910bb8af50f2b2f9f853ea9325259d4d",
+        "signed_prekey_signature_hex": "c99881fbe1a2dd1354841a02d3f404a06d9a507e2383d83302513facfd089a7ccc5bea7eb2e2784ac7fd25fc28184070e8855ff000dbeafb350b0ddc0e0f0901",
+        "opk_id": "opk-001",
+        "opk_priv_hex": "5b5c5d5e5f606162636465666768696a6b6c6d6e6f707172737475767778797a",
+        "opk_pub_hex": "7ec1365966f726fc171f9cabce9c6121e4f47691f1d745afb23c1ba6371d116f",
+        "opk_pub_der_hex": "302a300506032b656e0321007ec1365966f726fc171f9cabce9c6121e4f47691f1d745afb23c1ba6371d116f"
+      },
+      "expected_dh_outputs": {
+        "dh1_hex": "34a2b8088ca908bb1ef6cbf3aae9abfb92cf62b33945e7886c0d737fae047361",
+        "dh2_hex": "8d3900425eb418e0f9e787a4f1adee3f5c3cdf4d75f6412db46011b359eab01d",
+        "dh3_hex": "5133f868b9d3d8d6c5cc15a6b34c9f180519fd1d04e95fc8c857d35d213ad83c",
+        "dh4_hex": "8d63c817399ad080fab8cc703bda0f30dcd568c931e86e0cd693b068c36d851d"
+      },
+      "expected_hkdf_ikm_hex": "34a2b8088ca908bb1ef6cbf3aae9abfb92cf62b33945e7886c0d737fae0473618d3900425eb418e0f9e787a4f1adee3f5c3cdf4d75f6412db46011b359eab01d5133f868b9d3d8d6c5cc15a6b34c9f180519fd1d04e95fc8c857d35d213ad83c8d63c817399ad080fab8cc703bda0f30dcd568c931e86e0cd693b068c36d851d",
+      "expected_hkdf_output_hex": "17cfeb9372d784f39d8e209f893cbd304488f6c6366f7ade86406a9bb260ee02",
+      "expected_smx1_header_hex": "534d5831012da6dd857109353f72b23d674c7671f13aace39882c3dbe19b4931df156fe261000773706b2d30303100076f706b2d303031090a0b0c0d0e0f10090a0b0c",
+      "expected_initial_dr_root_key_hex": "17cfeb9372d784f39d8e209f893cbd304488f6c6366f7ade86406a9bb260ee02"
+    },
+    {
+      "name": "sender-to-recipient-opk-absent",
+      "sender": {
+        "device_id": "sender-device",
+        "identity_signing_seed_hex": "0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20",
+        "identity_signing_pub_hex": "79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664",
+        "identity_signing_pub_der_hex": "302a300506032b657003210079b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664",
+        "identity_key_priv_hex": "70788f1a0cea001a2631dae5d05dbd062008d5b30f50b9e29beb2a7822289044",
+        "identity_key_pub_hex": "4a3807d064d077181cc070989e76891d20dca5559548dc2c77c1a50273882b38",
+        "ephemeral_key_priv_hex": "080a0b0c0d0e0f10090a0b0c0d0e0f10090a0b0c0d0e0f10090a0b0c0d0e0f50",
+        "ephemeral_key_pub_hex": "2da6dd857109353f72b23d674c7671f13aace39882c3dbe19b4931df156fe261"
+      },
+      "recipient": {
+        "device_id": "recipient-device",
+        "identity_signing_seed_hex": "0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a",
+        "identity_signing_pub_hex": "542821e9529dd1ad243bfdff5c640a65194b4816987a650de861d7ce9e417a63",
+        "identity_signing_pub_der_hex": "302a300506032b6570032100542821e9529dd1ad243bfdff5c640a65194b4816987a650de861d7ce9e417a63",
+        "identity_key_priv_hex": "30b7cf2a6038d600c5a26ef1488ddae8b4fda9bce98aa9059a2033f59656ea52",
+        "identity_key_pub_hex": "60f88493e15eb7f02166956f852665e85f636fd3db6c1479fe0e7b2ebb7f4f40",
+        "signed_prekey_id": "spk-001",
+        "signed_prekey_priv_hex": "333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f505152",
+        "signed_prekey_pub_hex": "c15d2265459455c9ff156e6c1da6bfb7910bb8af50f2b2f9f853ea9325259d4d",
+        "signed_prekey_pub_der_hex": "302a300506032b656e032100c15d2265459455c9ff156e6c1da6bfb7910bb8af50f2b2f9f853ea9325259d4d",
+        "signed_prekey_signature_hex": "c99881fbe1a2dd1354841a02d3f404a06d9a507e2383d83302513facfd089a7ccc5bea7eb2e2784ac7fd25fc28184070e8855ff000dbeafb350b0ddc0e0f0901"
+      },
+      "expected_dh_outputs": {
+        "dh1_hex": "34a2b8088ca908bb1ef6cbf3aae9abfb92cf62b33945e7886c0d737fae047361",
+        "dh2_hex": "8d3900425eb418e0f9e787a4f1adee3f5c3cdf4d75f6412db46011b359eab01d",
+        "dh3_hex": "5133f868b9d3d8d6c5cc15a6b34c9f180519fd1d04e95fc8c857d35d213ad83c"
+      },
+      "expected_hkdf_ikm_hex": "34a2b8088ca908bb1ef6cbf3aae9abfb92cf62b33945e7886c0d737fae0473618d3900425eb418e0f9e787a4f1adee3f5c3cdf4d75f6412db46011b359eab01d5133f868b9d3d8d6c5cc15a6b34c9f180519fd1d04e95fc8c857d35d213ad83c",
+      "expected_hkdf_output_hex": "5a703f777eb2b36d3796fca6e97269349e0ffbb7e2ea4b43518da7275a5367f9",
+      "expected_smx1_header_hex": "534d5831002da6dd857109353f72b23d674c7671f13aace39882c3dbe19b4931df156fe261000773706b2d3030310000090a0b0c0d0e0f10090a0b0c",
+      "expected_initial_dr_root_key_hex": "5a703f777eb2b36d3796fca6e97269349e0ffbb7e2ea4b43518da7275a5367f9"
+    }
+  ]
+}

@@ -8,11 +8,13 @@ perform network calls, persistence, service-token handling, or aggregation.
 
 ## Status
 
-Early implementation. The primitive layer and wire serializers are present, and
-DR-v1 conformance tests consume the shared SemaFore vectors. The X3DH/SMX1
-state-machine path is intentionally gated until the canonical
-`x3dh-prekey-v1.json` vector exists and the X3DH HKDF parameter discrepancy
-between the iOS and Android planning records is resolved.
+Early implementation. The primitive layer, SMX1/SMD1 wire serializers, X3DH
+bootstrap helpers, and in-memory protocol session state machine are present.
+DR-v1 conformance tests consume the shared SemaFore vectors. The X3DH/SMX1 path
+has local round-trip coverage, but cannot be declared cross-language
+wire-compatible until the canonical `x3dh-prekey-v1.json` vector exists and the
+X3DH HKDF parameter discrepancy between the iOS and Android planning records is
+resolved.
 
 ## Install
 
@@ -24,18 +26,41 @@ npm install @attomus/semafore-crypto
 
 ```ts
 import {
-  aes256GcmDecrypt,
-  aes256GcmEncrypt,
-  generateX25519KeyPair,
-  x25519SharedSecret
+  decryptMessage,
+  encryptMessage,
+  generateEd25519KeyPair,
+  generateIdentityKeyPair,
+  generateOneTimePrekey,
+  generateSignedPrekey,
+  initReceiverSession,
+  initSenderSession
 } from '@attomus/semafore-crypto';
 
-const alice = generateX25519KeyPair();
-const bob = generateX25519KeyPair();
-const shared = x25519SharedSecret(alice.secretKey, bob.publicKey);
+const aliceIdentity = generateIdentityKeyPair();
+const bobIdentity = generateIdentityKeyPair();
+const bobSigning = generateEd25519KeyPair();
+const bobSpk = generateSignedPrekey(bobSigning.secretKey, 'spk-current');
+const bobOpk = generateOneTimePrekey('opk-001');
 
-const encrypted = aes256GcmEncrypt(shared, new TextEncoder().encode('Hello SemaFore'));
-const plaintext = aes256GcmDecrypt(shared, encrypted.nonce, encrypted.ciphertext);
+const aliceSession = initSenderSession({
+  myIdentity: aliceIdentity,
+  recipientBundle: {
+    identityAgreementKey: bobIdentity.publicKey,
+    identitySigningKey: bobSigning.publicKey,
+    signedPrekey: bobSpk,
+    oneTimePrekey: bobOpk
+  }
+});
+const firstEnvelope = encryptMessage(aliceSession, 'Hello SemaFore');
+
+const { session: bobSession } = initReceiverSession({
+  myIdentity: bobIdentity,
+  senderIdentityPublicKey: aliceIdentity.publicKey,
+  envelope: firstEnvelope,
+  signedPrekeyLookup: () => bobSpk,
+  oneTimePrekeyLookup: () => bobOpk
+});
+const plaintext = decryptMessage(bobSession, firstEnvelope);
 ```
 
 ## Security Model
