@@ -31,6 +31,7 @@ jobs:
           repository: attomus-sf/sf-shared-docs
           ref: dev
           path: sf-shared-docs
+          token: ${{ secrets.SHARED_DOCS_READ_TOKEN }}
 
       - name: Set up Node
         uses: actions/setup-node@v5
