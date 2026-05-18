@@ -1,0 +1,5 @@
+[allowlist]
+description = "Allow published deterministic cryptographic conformance vectors."
+paths = [
+  '''tests/vectors/x3dh-prekey-v1\.json'''
+]
