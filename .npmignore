@@ -1,0 +1,7 @@
+src/
+tests/
+coverage/
+docs/api/
+tsconfig.json
+tsup.config.ts
+eslint.config.js

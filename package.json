@@ -1,0 +1,68 @@
+{
+  "name": "@attomus/semafore-crypto",
+  "version": "0.1.0",
+  "description": "TypeScript implementation of SemaFore cryptographic wire-format primitives",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "SECURITY.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "lint": "eslint .",
+    "check": "tsc --noEmit",
+    "test": "vitest run",
+    "verify": "npm run lint && npm run check && npm run test && npm run build && npm audit --audit-level=high",
+    "docs": "typedoc src/index.ts",
+    "prepack": "npm run verify"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/attomus-sf/semafore-crypto.git"
+  },
+  "keywords": [
+    "semafore",
+    "x3dh",
+    "double-ratchet",
+    "e2e",
+    "encryption"
+  ],
+  "author": "Attomus",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/attomus-sf/semafore-crypto/issues"
+  },
+  "homepage": "https://github.com/attomus-sf/semafore-crypto#readme",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@noble/ciphers": "^2.2.0",
+    "@noble/curves": "^2.2.0",
+    "@noble/hashes": "^2.2.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^25.9.0",
+    "eslint": "^10.4.0",
+    "fast-check": "^4.8.0",
+    "prettier": "^3.8.3",
+    "tsup": "^8.5.1",
+    "typedoc": "^0.28.19",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.3",
+    "vitest": "^4.1.6"
+  }
+}
