@@ -3,6 +3,7 @@ import { ed25519Verify, hkdfSha256, x25519SharedSecret } from './primitives.js';
 
 export const X3DH_INFO_IOS_PLAN = 'SemaFore-X3DH-v1';
 export const X3DH_SALT_ANDROID_PLAN = 'SemaForeX3DHv1';
+export const X3DH_INFO_CANONICAL = 'SemaFore-X3DH-v1';
 
 export interface IdentityKeyPair {
   readonly publicKey: Uint8Array;
@@ -13,6 +14,7 @@ export interface SignedPrekey {
   readonly keyId: string;
   readonly publicKey: Uint8Array;
   readonly signature: Uint8Array;
+  readonly signatureMessage?: Uint8Array;
 }
 
 export interface LocalSignedPrekey extends SignedPrekey {
@@ -47,6 +49,15 @@ export interface X3dhSenderInput {
   readonly kdf: X3dhKdfParameters;
 }
 
+export interface X3dhSenderMaterial {
+  readonly dh1: Uint8Array;
+  readonly dh2: Uint8Array;
+  readonly dh3: Uint8Array;
+  readonly dh4?: Uint8Array;
+  readonly inputKeyMaterial: Uint8Array;
+  readonly sharedSecret: Uint8Array;
+}
+
 export interface X3dhReceiverInput {
   readonly receiverIdentitySecretKey: Uint8Array;
   readonly senderIdentityPublicKey: Uint8Array;
@@ -57,10 +68,18 @@ export interface X3dhReceiverInput {
 }
 
 export function verifySignedPrekey(identityPublicKey: Uint8Array, signedPrekey: SignedPrekey): boolean {
-  return ed25519Verify(signedPrekey.signature, signedPrekey.publicKey, identityPublicKey);
+  return ed25519Verify(
+    signedPrekey.signature,
+    signedPrekey.signatureMessage ?? signedPrekey.publicKey,
+    identityPublicKey
+  );
 }
 
 export function deriveX3dhSenderSecret(input: X3dhSenderInput): Uint8Array {
+  return deriveX3dhSenderMaterial(input).sharedSecret;
+}
+
+export function deriveX3dhSenderMaterial(input: X3dhSenderInput): X3dhSenderMaterial {
   if (!verifySignedPrekey(input.recipientBundle.identitySigningKey, input.recipientBundle.signedPrekey)) {
     throw new Error('recipient signed prekey signature is invalid');
   }
@@ -69,9 +88,17 @@ export function deriveX3dhSenderSecret(input: X3dhSenderInput): Uint8Array {
   const dh3 = x25519SharedSecret(input.senderEphemeralSecretKey, input.recipientBundle.signedPrekey.publicKey);
   const dh4 =
     input.recipientBundle.oneTimePrekey === undefined
-      ? new Uint8Array()
+      ? undefined
       : x25519SharedSecret(input.senderEphemeralSecretKey, input.recipientBundle.oneTimePrekey.publicKey);
-  return hkdfSha256(concatBytes([dh1, dh2, dh3, dh4]), input.kdf.salt, input.kdf.info, 32);
+  const inputKeyMaterial = concatBytes(dh4 === undefined ? [dh1, dh2, dh3] : [dh1, dh2, dh3, dh4]);
+  return {
+    dh1,
+    dh2,
+    dh3,
+    dh4,
+    inputKeyMaterial,
+    sharedSecret: hkdfSha256(inputKeyMaterial, input.kdf.salt, input.kdf.info, 32)
+  };
 }
 
 export function deriveX3dhReceiverSecret(input: X3dhReceiverInput): Uint8Array {
@@ -86,9 +113,13 @@ export function deriveX3dhReceiverSecret(input: X3dhReceiverInput): Uint8Array {
 }
 
 export function iosPlanX3dhKdfParameters(): X3dhKdfParameters {
+  return canonicalX3dhKdfParameters();
+}
+
+export function canonicalX3dhKdfParameters(): X3dhKdfParameters {
   return {
     salt: new Uint8Array(32),
-    info: utf8ToBytes(X3DH_INFO_IOS_PLAN)
+    info: utf8ToBytes(X3DH_INFO_CANONICAL)
   };
 }
 
