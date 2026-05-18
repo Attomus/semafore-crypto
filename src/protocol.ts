@@ -56,6 +56,7 @@ export interface SessionState {
   skippedMessageKeys: SkippedMessageKey[];
   pendingPrekey?: PendingPrekeyEnvelope;
   maxSkippedMessageKeys: number;
+  randomBytes?: (length: number) => Uint8Array;
 }
 
 export interface SkippedMessageKey {
@@ -75,6 +76,7 @@ export interface InitSenderSessionInput {
   readonly ephemeralKeyPair?: KeyPair;
   readonly kdf?: X3dhKdfParameters;
   readonly maxSkippedMessageKeys?: number;
+  readonly randomBytes?: (length: number) => Uint8Array;
 }
 
 export interface InitReceiverSessionInput {
@@ -159,7 +161,8 @@ export function initSenderSession(input: InitSenderSessionInput): SessionState {
       signedPrekeyId: input.recipientBundle.signedPrekey.keyId,
       oneTimePrekeyId: input.recipientBundle.oneTimePrekey?.keyId
     },
-    maxSkippedMessageKeys: input.maxSkippedMessageKeys ?? 64
+    maxSkippedMessageKeys: input.maxSkippedMessageKeys ?? 64,
+    randomBytes: input.randomBytes
   };
 }
 
@@ -216,7 +219,7 @@ export function encryptMessage(
       : plaintext;
   const chainKey = ensureSendingChain(session);
   const keys = deriveDrV1MessageKeys(chainKey);
-  const nonce = randomBytes(12);
+  const nonce = (session.randomBytes ?? randomBytes)(12);
   session.sendingChainKey = keys.nextChainKey;
 
   const pendingPrekey = session.pendingPrekey;

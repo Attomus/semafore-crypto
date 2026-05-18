@@ -64,8 +64,11 @@ export {
 } from './dr-v1.js';
 export {
   X3DH_INFO_IOS_PLAN,
+  X3DH_INFO_CANONICAL,
   X3DH_SALT_ANDROID_PLAN,
   androidPlanX3dhKdfParameters,
+  canonicalX3dhKdfParameters,
+  deriveX3dhSenderMaterial,
   deriveX3dhReceiverSecret,
   deriveX3dhSenderSecret,
   iosPlanX3dhKdfParameters,
@@ -78,7 +81,8 @@ export {
   type SignedPrekey,
   type X3dhKdfParameters,
   type X3dhReceiverInput,
-  type X3dhSenderInput
+  type X3dhSenderInput,
+  type X3dhSenderMaterial
 } from './x3dh.js';
 export {
   decryptMessage,
