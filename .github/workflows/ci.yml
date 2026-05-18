@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - dev
+      - staging
+      - main
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    steps:
+      - name: Check out library
+        uses: actions/checkout@v6
+        with:
+          path: semafore-crypto
+
+      - name: Check out shared vectors
+        uses: actions/checkout@v6
+        with:
+          repository: attomus-sf/sf-shared-docs
+          ref: dev
+          path: sf-shared-docs
+
+      - name: Set up Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: semafore-crypto/package-lock.json
+
+      - name: Install dependencies
+        working-directory: semafore-crypto
+        run: npm ci
+
+      - name: Run dependency audit
+        working-directory: semafore-crypto
+        run: npm audit --audit-level=high
+
+      - name: Lint
+        working-directory: semafore-crypto
+        run: npm run lint
+
+      - name: Type-check
+        working-directory: semafore-crypto
+        run: npm run check
+
+      - name: Test
+        working-directory: semafore-crypto
+        env:
+          SEMAFORE_TEST_VECTORS_DIR: ../sf-shared-docs/docs/test-vectors
+        run: npm run test
+
+      - name: Build
+        working-directory: semafore-crypto
+        run: npm run build
+
+      - name: Publish dry-run
+        if: github.event_name == 'pull_request'
+        working-directory: semafore-crypto
+        run: npm publish --dry-run --access public
+
+      - name: Publish tagged release
+        if: startsWith(github.ref, 'refs/tags/v')
+        working-directory: semafore-crypto
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public
