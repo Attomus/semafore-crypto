@@ -1,8 +1,19 @@
 import { hmac } from '@noble/hashes/hmac.js';
 import { sha256 } from '@noble/hashes/sha2.js';
 
-import { assertByteLength, concatBytes, equalBytes, readUint32BE, utf8ToBytes, writeUint32BE } from './bytes.js';
-import { hkdfSha256, X25519_KEY_LENGTH, x25519SharedSecret } from './primitives.js';
+import {
+  assertByteLength,
+  concatBytes,
+  equalBytes,
+  readUint32BE,
+  utf8ToBytes,
+  writeUint32BE
+} from './bytes.js';
+import {
+  hkdfSha256,
+  X25519_KEY_LENGTH,
+  x25519SharedSecret
+} from './primitives.js';
 
 export const SMD1_MAGIC = new Uint8Array([0x53, 0x4d, 0x44, 0x31]);
 export const SMD1_HEADER_LENGTH = 56;
@@ -28,8 +39,17 @@ export interface DrV1RatchetKeys {
   readonly chainKey: Uint8Array;
 }
 
+export interface DrV1BootstrapKeys {
+  readonly rootKey: Uint8Array;
+  readonly chainKey: Uint8Array;
+}
+
 export function encodeDrV1Header(header: DrV1Header): Uint8Array {
-  assertByteLength(header.ratchetPublicKey, X25519_KEY_LENGTH, 'DR-v1 ratchet public key');
+  assertByteLength(
+    header.ratchetPublicKey,
+    X25519_KEY_LENGTH,
+    'DR-v1 ratchet public key'
+  );
   assertByteLength(header.nonce, 12, 'DR-v1 nonce');
   return concatBytes([
     SMD1_MAGIC,
@@ -42,7 +62,9 @@ export function encodeDrV1Header(header: DrV1Header): Uint8Array {
 
 export function parseDrV1Header(input: Uint8Array): DrV1Header {
   if (input.length < SMD1_HEADER_LENGTH) {
-    throw new RangeError(`DR-v1 frame must be at least ${SMD1_HEADER_LENGTH} bytes`);
+    throw new RangeError(
+      `DR-v1 frame must be at least ${SMD1_HEADER_LENGTH} bytes`
+    );
   }
   if (!equalBytes(input.slice(0, 4), SMD1_MAGIC)) {
     throw new Error('DR-v1 header magic mismatch');
@@ -63,11 +85,32 @@ export function deriveDrV1MessageKeys(chainKey: Uint8Array): DrV1MessageKeys {
   };
 }
 
-export function deriveDrV1BootstrapRootKey(x3dhSharedSecret: Uint8Array): Uint8Array {
-  return hkdfSha256(x3dhSharedSecret, new Uint8Array(32), utf8ToBytes(DR_V1_BOOTSTRAP_INFO), 32);
+export function deriveDrV1BootstrapRootKey(
+  x3dhSharedSecret: Uint8Array
+): Uint8Array {
+  return deriveDrV1BootstrapKeys(x3dhSharedSecret).rootKey;
 }
 
-export function deriveDrV1RatchetKeys(rootKey: Uint8Array, localRatchetSecretKey: Uint8Array, remoteRatchetPublicKey: Uint8Array): DrV1RatchetKeys {
+export function deriveDrV1BootstrapKeys(
+  x3dhSharedSecret: Uint8Array
+): DrV1BootstrapKeys {
+  const output = hkdfSha256(
+    x3dhSharedSecret,
+    new Uint8Array(32),
+    utf8ToBytes(DR_V1_BOOTSTRAP_INFO),
+    64
+  );
+  return {
+    rootKey: output.slice(0, 32),
+    chainKey: output.slice(32, 64)
+  };
+}
+
+export function deriveDrV1RatchetKeys(
+  rootKey: Uint8Array,
+  localRatchetSecretKey: Uint8Array,
+  remoteRatchetPublicKey: Uint8Array
+): DrV1RatchetKeys {
   assertByteLength(rootKey, 32, 'DR-v1 root key');
   const dh = x25519SharedSecret(localRatchetSecretKey, remoteRatchetPublicKey);
   const output = hkdfSha256(dh, rootKey, utf8ToBytes(DR_V1_RATCHET_INFO), 64);

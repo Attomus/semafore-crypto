@@ -51,11 +51,13 @@ export {
   DR_V1_RATCHET_INFO,
   SMD1_HEADER_LENGTH,
   SMD1_MAGIC,
+  deriveDrV1BootstrapKeys,
   deriveDrV1BootstrapRootKey,
   deriveDrV1MessageKeys,
   deriveDrV1RatchetKeys,
   encodeDrV1Header,
   parseDrV1Header,
+  type DrV1BootstrapKeys,
   type DrV1Header,
   type DrV1MessageKeys,
   type DrV1RatchetKeys
@@ -78,3 +80,22 @@ export {
   type X3dhReceiverInput,
   type X3dhSenderInput
 } from './x3dh.js';
+export {
+  decryptMessage,
+  encryptMessage,
+  generateIdentityKeyPair,
+  generateOneTimePrekey,
+  generateSignedPrekey,
+  initReceiverSession,
+  initSenderSession,
+  publicOneTimePrekey,
+  publicSignedPrekey,
+  type Envelope,
+  type EnvelopeKind,
+  type InitReceiverSessionInput,
+  type InitReceiverSessionResult,
+  type InitSenderSessionInput,
+  type PendingPrekeyEnvelope,
+  type SessionState,
+  type SkippedMessageKey
+} from './protocol.js';
