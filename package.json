@@ -30,7 +30,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/attomus-sf/semafore-crypto.git"
+    "url": "git+https://github.com/Attomus/semafore-crypto.git"
   },
   "keywords": [
     "semafore",
@@ -42,9 +42,9 @@
   "author": "Attomus",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/attomus-sf/semafore-crypto/issues"
+    "url": "https://github.com/Attomus/semafore-crypto/issues"
   },
-  "homepage": "https://github.com/attomus-sf/semafore-crypto#readme",
+  "homepage": "https://github.com/Attomus/semafore-crypto#readme",
   "engines": {
     "node": ">=18"
   },
