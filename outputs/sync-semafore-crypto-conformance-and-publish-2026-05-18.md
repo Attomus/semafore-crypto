@@ -2,7 +2,11 @@
 
 ## Status
 
-`@attomus/semafore-crypto` is ready for review toward `v1.0.0`.
+`@attomus/semafore-crypto` is tagged at `v1.0.0` on `main`.
+
+Publish is blocked on npm credentials: the tag workflow reached `npm publish`,
+but `NODE_AUTH_TOKEN` was empty because the repo has no `NPM_TOKEN` secret.
+Local npm auth is also absent (`npm whoami` returns `ENEEDAUTH`).
 
 ## Completed
 
@@ -12,13 +16,22 @@
 - Added support for signed-prekey signature messages so the library can verify the Android vector's DER-encoded signed-prekey signature input.
 - Added deterministic nonce injection for conformance tests without changing the default random-nonce runtime path.
 - Bumped package metadata to `1.0.0` and added `CHANGELOG.md`.
+- Merged PR #6 to `dev`, PR #7 to `staging`, and PR #8 to `main`.
+- Tagged `v1.0.0` at main commit `c811e9e`.
 
 ## Verification
 
-- `npm run test -- tests/wire-format.test.ts` passed locally after wiring the vector.
-- Full verification, current-tree secret scan, package dry-run, PR readiness, tag, and npm publish remain to be completed after the final local sweep and PR merge.
+- `npm run verify` passed locally.
+- `gitleaks dir --no-banner -v .` passed locally.
+- `npm publish --dry-run --access public` passed locally.
+- PR #6 CI passed: run `26061523766`.
+- `dev` CI passed: run `26061576430`.
+- `staging` CI passed: run `26061619594`.
+- `main` CI passed: run `26061656977`.
+- Tag CI passed through build/test, then failed at publish because `NPM_TOKEN` is not configured: run `26061695164`.
 
 ## Publish Notes
 
-- After PR #6 merges to `main`, tag `v1.0.0` and publish `@attomus/semafore-crypto@1.0.0`.
-- If npm auth or GitHub Actions publishing is still blocked, hold at the ready-for-review PR state and coordinate operator credentials before publishing.
+- Add an npm automation token as GitHub secret `NPM_TOKEN` on `Attomus/semafore-crypto`.
+- Re-run failed tag workflow `26061695164`, or run `npm publish --access public` locally after `npm adduser`.
+- Confirm `npm view @attomus/semafore-crypto version` returns `1.0.0`.
