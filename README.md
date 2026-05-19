@@ -10,7 +10,7 @@ handling, no storage, and no aggregation.
 
 ## Status
 
-Early public release. The package is published as `0.1.0`, but the surrounding
+Early public release. The package is versioned as `0.1.0`, but the surrounding
 SemaFore integration surface is still in active development and the API may
 change before the GitHub Action reaches Marketplace readiness.
 
