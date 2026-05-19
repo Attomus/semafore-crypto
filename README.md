@@ -42,19 +42,24 @@ npm install @attomus/semafore-crypto
 
 ```ts
 import {
-  decryptMessage,
-  encryptMessage,
-  generateEd25519KeyPair,
   generateIdentityKeyPair,
-  generateOneTimePrekey,
+  generateEd25519KeyPair,
   generateSignedPrekey,
+  generateOneTimePrekey,
   initReceiverSession,
-  initSenderSession
+  initSenderSession,
+  encryptMessage,
+  decryptMessage
 } from '@attomus/semafore-crypto';
 
+const decode = (bytes: Uint8Array) => new TextDecoder().decode(bytes);
+
+// Long-lived identity keys: X25519 for ECDH, Ed25519 for signatures.
 const aliceIdentity = generateIdentityKeyPair();
 const bobIdentity = generateIdentityKeyPair();
 const bobSigning = generateEd25519KeyPair();
+
+// Bob publishes a signed prekey and one-time prekeys. Alice fetches them as a bundle.
 const bobSpk = generateSignedPrekey(bobSigning.secretKey, 'spk-current');
 const bobOpk = generateOneTimePrekey('opk-001');
 
@@ -68,8 +73,11 @@ const aliceSession = initSenderSession({
   }
 });
 
+// First message: carries the X3DH bootstrap. Later messages on this session
+// use the Double Ratchet continuation path.
 const firstEnvelope = encryptMessage(aliceSession, 'Hello SemaFore');
 
+// Bob's prekey lookups typically hit on-device storage; stubbed here.
 const { session: bobSession } = initReceiverSession({
   myIdentity: bobIdentity,
   senderIdentityPublicKey: aliceIdentity.publicKey,
@@ -79,6 +87,11 @@ const { session: bobSession } = initReceiverSession({
 });
 
 const plaintext = decryptMessage(bobSession, firstEnvelope);
+console.log(decode(plaintext)); // 'Hello SemaFore'
+
+// Second message: same session, now continuing under Double Ratchet.
+const secondEnvelope = encryptMessage(aliceSession, 'and again');
+console.log(decode(decryptMessage(bobSession, secondEnvelope))); // 'and again'
 ```
 
 ## Wire Formats
