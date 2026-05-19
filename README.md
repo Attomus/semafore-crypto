@@ -32,6 +32,8 @@ OPK-present and OPK-absent SMX1 cases.
 
 ## Install
 
+Once the package is published to npm:
+
 ```sh
 npm install @attomus/semafore-crypto
 ```
