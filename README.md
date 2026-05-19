@@ -64,7 +64,7 @@ const bobSpk = generateSignedPrekey(bobSigning.secretKey, 'spk-current');
 const bobOpk = generateOneTimePrekey('opk-001');
 
 const aliceSession = initSenderSession({
-  myIdentity: aliceIdentity,
+  localIdentity: aliceIdentity,
   recipientBundle: {
     identityAgreementKey: bobIdentity.publicKey,
     identitySigningKey: bobSigning.publicKey,
@@ -79,8 +79,8 @@ const firstEnvelope = encryptMessage(aliceSession, 'Hello SemaFore');
 
 // Bob's prekey lookups typically hit on-device storage; stubbed here.
 const { session: bobSession } = initReceiverSession({
-  myIdentity: bobIdentity,
-  senderIdentityPublicKey: aliceIdentity.publicKey,
+  localIdentity: bobIdentity,
+  peerIdentityPublicKey: aliceIdentity.publicKey,
   envelope: firstEnvelope,
   signedPrekeyLookup: () => bobSpk,
   oneTimePrekeyLookup: () => bobOpk

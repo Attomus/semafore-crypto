@@ -71,7 +71,7 @@ export interface PendingPrekeyEnvelope {
 }
 
 export interface InitSenderSessionInput {
-  readonly myIdentity: IdentityKeyPair;
+  readonly localIdentity: IdentityKeyPair;
   readonly recipientBundle: KeyBundle;
   readonly ephemeralKeyPair?: KeyPair;
   readonly kdf?: X3dhKdfParameters;
@@ -80,8 +80,8 @@ export interface InitSenderSessionInput {
 }
 
 export interface InitReceiverSessionInput {
-  readonly myIdentity: IdentityKeyPair;
-  readonly senderIdentityPublicKey: Uint8Array;
+  readonly localIdentity: IdentityKeyPair;
+  readonly peerIdentityPublicKey: Uint8Array;
   readonly envelope: Uint8Array | Envelope;
   readonly signedPrekeyLookup: (keyId: string) => LocalSignedPrekey;
   readonly oneTimePrekeyLookup?: (
@@ -141,7 +141,7 @@ export function publicOneTimePrekey(prekey: LocalOneTimePrekey): OneTimePrekey {
 export function initSenderSession(input: InitSenderSessionInput): SessionState {
   const ephemeralKeyPair = input.ephemeralKeyPair ?? generateX25519KeyPair();
   const x3dhSecret = deriveX3dhSenderSecret({
-    senderIdentitySecretKey: input.myIdentity.secretKey,
+    senderIdentitySecretKey: input.localIdentity.secretKey,
     senderEphemeralSecretKey: ephemeralKeyPair.secretKey,
     recipientBundle: input.recipientBundle,
     kdf: input.kdf ?? iosPlanX3dhKdfParameters()
@@ -184,8 +184,8 @@ export function initReceiverSession(
   }
 
   const x3dhSecret = deriveX3dhReceiverSecret({
-    receiverIdentitySecretKey: input.myIdentity.secretKey,
-    senderIdentityPublicKey: input.senderIdentityPublicKey,
+    receiverIdentitySecretKey: input.localIdentity.secretKey,
+    senderIdentityPublicKey: input.peerIdentityPublicKey,
     senderEphemeralPublicKey: parsedEnvelope.senderEphemeralPublicKey,
     receiverSignedPrekey: signedPrekey,
     receiverOneTimePrekey: oneTimePrekey,

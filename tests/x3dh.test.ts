@@ -76,7 +76,7 @@ describe('X3DH derivation helpers', () => {
     const bobOpk = generateOneTimePrekey('opk-live');
 
     const senderSession = initSenderSession({
-      myIdentity: aliceIdentity,
+      localIdentity: aliceIdentity,
       recipientBundle: {
         identityAgreementKey: bobIdentity.publicKey,
         identitySigningKey: bobSigning.publicKey,
@@ -97,8 +97,8 @@ describe('X3DH derivation helpers', () => {
     expect(senderSession.pendingPrekey).toBeUndefined();
 
     const receiverInit = initReceiverSession({
-      myIdentity: bobIdentity,
-      senderIdentityPublicKey: aliceIdentity.publicKey,
+      localIdentity: bobIdentity,
+      peerIdentityPublicKey: aliceIdentity.publicKey,
       envelope: first,
       signedPrekeyLookup: (keyId) => {
         expect(keyId).toBe('spk-live');
@@ -122,7 +122,7 @@ describe('X3DH derivation helpers', () => {
     const bobSpk = generateSignedPrekey(bobSigning.secretKey, 'spk-live');
     const bobOpk = generateOneTimePrekey('opk-live');
     const senderSession = initSenderSession({
-      myIdentity: aliceIdentity,
+      localIdentity: aliceIdentity,
       recipientBundle: {
         identityAgreementKey: bobIdentity.publicKey,
         identitySigningKey: bobSigning.publicKey,
@@ -144,8 +144,8 @@ describe('X3DH derivation helpers', () => {
 
     expect(() =>
       initReceiverSession({
-        myIdentity: bobIdentity,
-        senderIdentityPublicKey: aliceIdentity.publicKey,
+        localIdentity: bobIdentity,
+        peerIdentityPublicKey: aliceIdentity.publicKey,
         envelope: first,
         signedPrekeyLookup: () => bobSpk
       })

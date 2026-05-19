@@ -187,7 +187,7 @@ describe('X3DH SMX1 conformance vectors', () => {
       expect(bytesToHex(material.sharedSecret)).toBe(testCase.expected_initial_dr_root_key_hex);
 
       const senderSession = initSenderSession({
-        myIdentity: {
+        localIdentity: {
           publicKey: new Uint8Array(32),
           secretKey: hexToBytes(testCase.sender.identity_key_priv_hex)
         },

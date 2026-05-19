@@ -35,13 +35,13 @@ function createSessions() {
   };
 
   const alice = initSenderSession({
-    myIdentity: aliceIdentity,
+    localIdentity: aliceIdentity,
     recipientBundle
   });
   const first = encryptMessage(alice, 'first contact');
   const bobInit = initReceiverSession({
-    myIdentity: bobIdentity,
-    senderIdentityPublicKey: aliceIdentity.publicKey,
+    localIdentity: bobIdentity,
+    peerIdentityPublicKey: aliceIdentity.publicKey,
     envelope: first,
     signedPrekeyLookup: () => bobSpk,
     oneTimePrekeyLookup: () => bobOpk
