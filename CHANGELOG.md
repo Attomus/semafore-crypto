@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1 - 2026-05-27
+
+- Switched npm release publishing to npm Trusted Publishing through GitHub Actions OIDC.
+
 ## 1.0.0 - 2026-05-27
 
 - Added sender and receiver SMX1 first-contact session support.
