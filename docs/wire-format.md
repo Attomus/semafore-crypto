@@ -59,12 +59,13 @@ Skipped message keys are retained in-memory only and are bounded by the
 session's `maxSkippedMessageKeys` setting, which defaults to 64. Callers remain
 responsible for durable session persistence between process runs.
 
-## Open Conformance Item
+## Conformance
 
-`x3dh-prekey-v1.json` is still required before the SMX1 state machine can claim
-cross-language wire compatibility. The iOS plan and Android plan currently
-disagree on X3DH HKDF parameter placement: iOS records info
-`SemaFore-X3DH-v1`, while an Android note records salt `SemaForeX3DHv1` with
-empty info. The library exposes both parameter helpers but defaults the
-high-level session API to the iOS Phase 3 parameters until the shared vector
-resolves the canonical choice.
+The test suite covers the checked-in SemaFore vectors:
+
+- `dr-v1-interop.json`
+- `x3dh-prekey-v1.json`, pinned from `sf-shared-docs` commit `5ac5899`
+
+The SMX1 vector covers both OPK-present and OPK-absent first-contact flows and
+asserts sender DH outputs, HKDF input material, HKDF output, and serialized
+SMX1 header bytes.
