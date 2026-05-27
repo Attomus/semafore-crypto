@@ -13,6 +13,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   test:
@@ -76,6 +77,4 @@ jobs:
       - name: Publish tagged release
         if: startsWith(github.ref, 'refs/tags/v')
         working-directory: semafore-crypto
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish --access public
