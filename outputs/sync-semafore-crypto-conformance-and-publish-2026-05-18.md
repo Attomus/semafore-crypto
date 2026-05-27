@@ -2,7 +2,7 @@
 
 ## Status
 
-`@attomus/semafore-crypto` is release-prepped for `v1.0.0`.
+`@attomus/semafore-crypto` is release-prepped for `v1.0.0` on `main`.
 
 Publish remains blocked on npm credentials. The repo has no `NPM_TOKEN` secret,
 and local npm auth is absent (`npm whoami` returns `ENEEDAUTH`). The npm
@@ -18,6 +18,7 @@ package version is live yet.
 - Added deterministic nonce injection for conformance tests without changing the default random-nonce runtime path.
 - Confirmed PR #6 is merged and no longer draft.
 - Bumped package metadata to `1.0.0` and refreshed `CHANGELOG.md`.
+- Merged release-prep PR #10 to `main` at `6494a9e`.
 
 ## Verification
 
@@ -27,10 +28,12 @@ package version is live yet.
   tarball size was 35096 bytes.
 - PR #6 CI passed: run `26061523766`.
 - GitHub Actions is enabled for `Attomus/semafore-crypto`.
+- PR #10 CI passed: run `26522511777`.
+- Main CI passed after PR #10 merged: run `26522565555`.
 
 ## Publish Notes
 
 - Add an npm automation token as GitHub secret `NPM_TOKEN` on `Attomus/semafore-crypto`.
-- Tag `v1.0.0` after the release-prep PR merges to `main`.
+- Tag `v1.0.0` after `NPM_TOKEN` is configured or local npm auth is available.
 - Let the tag workflow publish, or run `npm publish --access public` locally after `npm adduser`.
 - Confirm `npm view @attomus/semafore-crypto version` returns `1.0.0`.
