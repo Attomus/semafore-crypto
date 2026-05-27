@@ -10,9 +10,10 @@ handling, no storage, and no aggregation.
 
 ## Status
 
-Early public release. The package is versioned as `0.1.0`, but the surrounding
-SemaFore integration surface is still in active development and the API may
-change before the GitHub Action reaches Marketplace readiness.
+Release candidate for `1.0.0`. The cryptographic wire-format surface is covered
+by byte-level conformance vectors, but the surrounding SemaFore integration
+surface is still in active development while the GitHub Action moves toward
+Marketplace readiness.
 
 Implemented today:
 
@@ -32,7 +33,7 @@ OPK-present and OPK-absent SMX1 cases.
 
 ## Install
 
-Once the package is published to npm:
+After the npm release is published:
 
 ```sh
 npm install @attomus/semafore-crypto

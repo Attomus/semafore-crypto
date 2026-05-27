@@ -1,12 +1,13 @@
-# SemaFore Crypto Conformance and Publish Sync - 2026-05-18
+# SemaFore Crypto Conformance and Publish Sync - 2026-05-27
 
 ## Status
 
-`@attomus/semafore-crypto` is tagged at `v1.0.0` on `main`.
+`@attomus/semafore-crypto` is release-prepped for `v1.0.0`.
 
-Publish is blocked on npm credentials: the tag workflow reached `npm publish`,
-but `NODE_AUTH_TOKEN` was empty because the repo has no `NPM_TOKEN` secret.
-Local npm auth is also absent (`npm whoami` returns `ENEEDAUTH`).
+Publish remains blocked on npm credentials. The repo has no `NPM_TOKEN` secret,
+and local npm auth is absent (`npm whoami` returns `ENEEDAUTH`). The npm
+registry currently returns `E404` for `@attomus/semafore-crypto`, so no public
+package version is live yet.
 
 ## Completed
 
@@ -15,23 +16,21 @@ Local npm auth is also absent (`npm whoami` returns `ENEEDAUTH`).
 - Asserted sender DH outputs, HKDF IKM, HKDF output, and serialized SMX1 header bytes.
 - Added support for signed-prekey signature messages so the library can verify the Android vector's DER-encoded signed-prekey signature input.
 - Added deterministic nonce injection for conformance tests without changing the default random-nonce runtime path.
-- Bumped package metadata to `1.0.0` and added `CHANGELOG.md`.
-- Merged PR #6 to `dev`, PR #7 to `staging`, and PR #8 to `main`.
-- Tagged `v1.0.0` at main commit `c811e9e`.
+- Confirmed PR #6 is merged and no longer draft.
+- Bumped package metadata to `1.0.0` and refreshed `CHANGELOG.md`.
 
 ## Verification
 
 - `npm run verify` passed locally.
-- `gitleaks dir --no-banner -v .` passed locally.
-- `npm publish --dry-run --access public` passed locally.
+- `gitleaks detect --no-banner -v` passed locally.
+- `npm pack --dry-run --json` passed locally at package version `1.0.0`;
+  tarball size was 35096 bytes.
 - PR #6 CI passed: run `26061523766`.
-- `dev` CI passed: run `26061576430`.
-- `staging` CI passed: run `26061619594`.
-- `main` CI passed: run `26061656977`.
-- Tag CI passed through build/test, then failed at publish because `NPM_TOKEN` is not configured: run `26061695164`.
+- GitHub Actions is enabled for `Attomus/semafore-crypto`.
 
 ## Publish Notes
 
 - Add an npm automation token as GitHub secret `NPM_TOKEN` on `Attomus/semafore-crypto`.
-- Re-run failed tag workflow `26061695164`, or run `npm publish --access public` locally after `npm adduser`.
+- Tag `v1.0.0` after the release-prep PR merges to `main`.
+- Let the tag workflow publish, or run `npm publish --access public` locally after `npm adduser`.
 - Confirm `npm view @attomus/semafore-crypto version` returns `1.0.0`.
