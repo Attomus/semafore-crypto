@@ -20,4 +20,4 @@ jobs:
       - name: Mark package public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm access public @attomus/semafore-crypto
+        run: npm access set status=public @attomus/semafore-crypto
