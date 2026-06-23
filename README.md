@@ -10,7 +10,7 @@ handling, no storage, and no aggregation.
 
 ## Status
 
-Release candidate for `1.0.0`. The cryptographic wire-format surface is covered
+Current package line is `1.0.1`. The cryptographic wire-format surface is covered
 by byte-level conformance vectors, but the surrounding SemaFore integration
 surface is still in active development while the GitHub Action moves toward
 Marketplace readiness.

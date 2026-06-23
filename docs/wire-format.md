@@ -26,6 +26,34 @@ Example prefix for an OPK-backed envelope:
 53 4d 58 31 01 ...
 ```
 
+### SMX1 header integrity
+
+SMX1 does not currently pass its serialized header bytes as AES-GCM additional
+authenticated data. Header integrity instead rests on the X3DH agreement:
+
+- the sender ephemeral public key feeds the receiver-side DH2/DH3/DH4 inputs;
+- the signed-prekey id selects the receiver signed prekey secret used for DH1
+  and DH3;
+- the one-time-prekey id, when present, selects the receiver OPK secret used for
+  DH4;
+- the nonce is the AES-GCM nonce for the derived first-message key.
+
+Tampering with any of those fields makes the receiver derive a different
+message key or use a different GCM nonce, so decryption fails the GCM
+authentication check and yields no plaintext. The protocol tests include
+explicit SMX1 tamper cases for `senderEphemeralPublicKey`, `signedPrekeyId`,
+`oneTimePrekeyId`, and `nonce` to lock this implicit-authentication property
+against regression.
+
+OPK lookup must be read-only. Callers should consume/burn the referenced OPK
+only after SMX1 decryption succeeds; a tampered `oneTimePrekeyId` that points at
+another valid OPK must not burn that unrelated OPK before the GCM check fails.
+
+The next versioned first-contact frame should bind the SMX1-equivalent header
+as explicit AES-GCM AAD for consistency with SMD1. That is a breaking
+wire-format change and must land with a version discriminator and cross-platform
+conformance vectors.
+
 ## SMD1 / DR-v1
 
 SMD1 is the SemaFore Double Ratchet v1 frame header. The server stores and
