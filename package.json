@@ -1,6 +1,6 @@
 {
   "name": "@attomus/semafore-crypto",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "TypeScript implementation of SemaFore cryptographic wire-format primitives",
   "type": "module",
   "main": "./dist/index.cjs",
