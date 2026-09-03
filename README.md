@@ -135,6 +135,24 @@ npm run verify
 
 Please report security issues privately. See [SECURITY.md](./SECURITY.md).
 
+## Maintainer Releases
+
+Releases publish through npm Trusted Publishing from the GitHub-hosted
+[`ci.yml`](./.github/workflows/ci.yml) workflow. No long-lived npm write token
+is required.
+
+1. Update `package.json` and `package-lock.json` to the intended version and
+   merge the verified change to `main`.
+2. Create a `vX.Y.Z` tag on that exact `main` commit, matching the package
+   version exactly, and push the tag.
+3. Confirm the tag-triggered CI test and publish jobs pass, then verify the new
+   version and provenance on npm.
+
+The workflow refuses a mismatched tag or a version that already exists on npm.
+Published package versions are immutable. If a release is defective, deprecate
+that version with `npm deprecate @attomus/semafore-crypto@X.Y.Z "reason"`, fix
+the issue, increment the version, and publish the replacement.
+
 ## License
 
 Apache-2.0.

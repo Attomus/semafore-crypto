@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.2 - 2026-09-03
+
+- Added release tag/version validation and a duplicate-publication guard.
+- Restricted npm Trusted Publishing's OIDC permission to the tag-only publish
+  job.
+- Documented the maintainer release and rollback process.
+
 ## 1.0.1 - 2026-05-27
 
 - Switched npm release publishing to npm Trusted Publishing through GitHub Actions OIDC.
