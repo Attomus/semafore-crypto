@@ -29,7 +29,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           repository: attomus-sf/sf-shared-docs
-          ref: dev
+          ref: main
           path: sf-shared-docs
           token: ${{ secrets.SHARED_DOCS_READ_TOKEN }}
 
@@ -92,7 +92,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           repository: attomus-sf/sf-shared-docs
-          ref: dev
+          ref: main
           path: sf-shared-docs
           token: ${{ secrets.SHARED_DOCS_READ_TOKEN }}
 
